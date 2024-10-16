@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Cliente {
+  id_cliente     Int      @id @default(autoincrement())
+  nombre_cliente String
+  telefono       String
+  direccion      String
+  nombre_tienda  String
+  ruta           String
+
+  pedidos        Pedido[]
+}
+
+model Pedido {
+  id         Int      @id @default(autoincrement())
+  cliente_id Int
+  fecha      DateTime
+  total      Decimal  @db.Decimal(10, 2)
+  estado     Estado
+
+  cliente    Cliente  @relation(fields: [cliente_id], references: [id_cliente])
+  pagos      Pago[]
+  detalles   DetallePedido[]
+}
+
+model Pago {
+  id         Int      @id @default(autoincrement())
+  pedido_id  Int
+  monto      Decimal  @db.Decimal(10, 2)
+  fecha      DateTime
+
+  pedido     Pedido   @relation(fields: [pedido_id], references: [id])
+}
+
+model Producto {
+  id              Int      @id @default(autoincrement())
+  nombre_producto String
+  precio_compra   Decimal  @db.Decimal(10, 2)
+  cantidad        Int
+}
+
+model DetallePedido {
+  id           Int      @id @default(autoincrement())
+  pedido_id    Int
+  producto     String
+  cantidad     Decimal  @db.Decimal(10, 2)
+  precio_compra Decimal  @db.Decimal(10, 2)
+  precio_venta Decimal  @db.Decimal(10, 2)
+
+  pedido       Pedido   @relation(fields: [pedido_id], references: [id])
+}
+
+enum Estado {
+  pagado
+  fiado
+}
+
+model User{
+  id Int @id @default(autoincrement())
+  name String @unique
+  email String @unique
+  password String
+  createdAt DateTime @default(now())
+}
