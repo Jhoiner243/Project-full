@@ -5,6 +5,7 @@ import { GetLogin, updateLogin } from "../controller/GET/GetLogin";
 import { AñadirProductos } from "../controller/POST/Productos";
 import { pedidosCreate } from "../controller/POST/PedidosPOST";
 import { clientesPOST } from "../controller/POST/clientes/clientes";
+import { clienteEdit } from "../controller/POST/clientes/clienteEdit";
 
 export const router: Router = Router();
 
@@ -15,3 +16,4 @@ router.put("login/:id", updateLogin)
 router.post('/productos', AñadirProductos)
 router.post('/pedidos', pedidosCreate)
 router.post('/clientes', clientesPOST)
+router.put('/cliente/:id_cliente', clienteEdit)

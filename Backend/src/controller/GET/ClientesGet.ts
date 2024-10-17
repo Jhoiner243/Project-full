@@ -15,5 +15,6 @@ clientesGet.get('/clientes', async (req, res) => {
   }
 });
 
+
 // Exporta el router para usarlo en otras partes de la aplicación
 export default clientesGet;

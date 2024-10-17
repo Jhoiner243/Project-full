@@ -1,14 +1,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './App.css'
-import ErrorPage from '../pages/errorPage.tsx'
+import ErrorPage from '../pages/error-pages/errorPage.tsx'
 import {createBrowserRouter, RouterProvider} from 'react-router-dom'
-import Register from '../pages/register.tsx'
-import {Login} from '../pages/login.tsx'
-import DashboardLayoutComponent from '../pages/dashboard-layout.tsx'
+import Register from '../pages/Sesion/register.tsx'
+import {Login} from '../pages/Sesion/login.tsx'
+import DashboardLayoutComponent from '../pages/dashboard.tsx'
 import  ProductViewComponent  from '../pages/product-view.tsx'
-import PedidosComponentComponent from '../pages/pedidos-component.tsx'
-import PedidosPage from '../pages/Pedidos/pedidos-page.tsx'
+import PedidosComponentComponent from '../pages/Pedidos/pedidos-component.tsx'
+import ClientesPage from '../pages/Clientes/clientes.tsx'
+
 
 const router = createBrowserRouter ([
   {
@@ -32,13 +33,21 @@ const router = createBrowserRouter ([
         element: <ProductViewComponent/>,
         errorElement: <ErrorPage/>
       },
+     
   ]
+    
 
 },
 
 {
   path: '/clientes',
-  element: <PedidosPage />
+  element: <ClientesPage />,
+  children: [
+    {
+      path: 'clientes/:id_cliente'
+
+    }
+  ]
 }
 ])
 

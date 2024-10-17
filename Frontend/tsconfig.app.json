@@ -25,5 +25,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "pages/register.tsx", "pages/dashboard-layout.tsx", "pages/error.tsx", "pages/product-view.tsx", "pages/pedidos-component.tsx"]
+  "include": ["src", "pages/Sesion/register.tsx", "pages/dashboard-layout.tsx", "pages/error.tsx", "pages/product-view.tsx", "pages/Pedidos/pedidos-component.tsx", "pages/dashboard.tsx", "pages/dashboard.tsx"]
 }

@@ -1,9 +1,9 @@
 'use client'
-import {useLogin} from '../src/hooks/useLogin'
-import { Button } from "../src/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../src/components/ui/card"
-import { Input } from "../src/components/ui/input"
-import { Label } from "../src/components/ui/label"
+import {useLogin} from '../../src/hooks/useLogin'
+import { Button } from "../../src/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../src/components/ui/card"
+import { Input } from "../../src/components/ui/input"
+import { Label } from "../../src/components/ui/label"
 
 
 export const Login = () =>{

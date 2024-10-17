@@ -16,5 +16,6 @@ export const clientesPOST = async (req: Request, res: Response): Promise<void> =
         }
     })
 
+
     res.status(200).json('Cliente creado exitosamente')
 }

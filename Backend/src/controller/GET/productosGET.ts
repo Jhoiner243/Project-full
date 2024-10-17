@@ -17,5 +17,16 @@ productosRouter.get('/productos', async (req, res) => {
   }
 });
 
+productosRouter.delete('/productos/:id', async (req, res) =>{
+  try {
+    const deleteProductos = await db.producto.delete({
+      where:{
+      id : parseInt(req.params.id)
+}    })
+  } catch (error) {
+    
+  }
+})
+
 // Exporta el router para usarlo en otras partes de la aplicación
 export default productosRouter;

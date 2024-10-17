@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import usePedido from '../src/hooks/Pedidos/usePedido'
+import usePedido from '../../src/hooks/Pedidos/usePedido'
 import { useClientes } from '@/hooks/Clientes/useClientes'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -42,11 +42,9 @@ export default function PedidosComponentComponent() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">Nuevo Pedido</h1>
       <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-2/3">
-          <h2 className="text-2xl font-bold mb-4">Productos Disponibles</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 mb-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 text-center mb-0">
             {productos.filter(p => p.cantidad > 0).map((producto) => (
               <Card 
                 key={producto.id} 
@@ -62,12 +60,13 @@ export default function PedidosComponentComponent() {
           </div>
           <div className="mt-4 p-4 border rounded-lg">
             <h3 className="font-semibold mb-2">Producto Seleccionado</h3>
-            <p className="text-sm mb-2">
+            <p className="text-sm mb-2 flex gap-2 my-2">
               {productoSeleccionado 
                 ? productos.find(p => p.id === productoSeleccionado)?.nombre_producto 
                 : 'Ningún producto seleccionado'}
             </p>
-            <div className="flex gap-2 mb-2">
+            <div className="flex gap-2 mb-2 flex-1 pb-8">
+              <div>
               <Input
                 type="number"
                 min="0"
@@ -77,6 +76,8 @@ export default function PedidosComponentComponent() {
                 className="w-1/2"
                 placeholder="Cantidad"
               />
+              </div>
+              <div className='pb-8 '>
               <Input
                 type="number"
                 min="0"
@@ -85,6 +86,7 @@ export default function PedidosComponentComponent() {
                 className="w-1/2"
                 placeholder="Precio de venta"
               />
+              </div>
             </div>
             <Button 
               type="button" 
