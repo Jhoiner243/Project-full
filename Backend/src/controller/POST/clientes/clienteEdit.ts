@@ -6,7 +6,7 @@ import validator from "validator";
 export const clienteEdit = async (req: Request, res: Response): Promise<void> => {
     try {
         // Validar el ID del cliente
-        const id_cliente = req.params.id;
+        const id_cliente = req.params.id_cliente;
         if (!validator.isNumeric(id_cliente)) {
             res.status(400).json({ message: 'ID del cliente no es válido, debe ser numérico' });
             return 

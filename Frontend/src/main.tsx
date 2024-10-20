@@ -5,7 +5,7 @@ import ErrorPage from '../pages/error-pages/errorPage.tsx'
 import {createBrowserRouter, RouterProvider} from 'react-router-dom'
 import Register from '../pages/Sesion/register.tsx'
 import {Login} from '../pages/Sesion/login.tsx'
-import DashboardLayoutComponent from '../pages/dashboard.tsx'
+import Layout from '../app/layout.tsx'
 import  ProductViewComponent  from '../pages/product-view.tsx'
 import PedidosComponentComponent from '../pages/Pedidos/pedidos-component.tsx'
 import ClientesPage from '../pages/Clientes/clientes.tsx'
@@ -24,7 +24,7 @@ const router = createBrowserRouter ([
   },
   {
     path: '/dashboard',
-    element: <DashboardLayoutComponent/>,
+    element: <Layout/>,
     errorElement: <ErrorPage />,
   children: [
     {index: true, element: <PedidosComponentComponent />},
@@ -33,23 +33,21 @@ const router = createBrowserRouter ([
         element: <ProductViewComponent/>,
         errorElement: <ErrorPage/>
       },
-     
-  ]
-    
-
-},
-
-{
-  path: '/clientes',
-  element: <ClientesPage />,
-  children: [
-    {
-      path: 'clientes/:id_cliente'
-
+      {
+        path: 'clientes',
+        element: <ClientesPage />,
+      },
+        
+      {
+        path: 'clientes/:id_cliente',
+        element: <ClientesPage />
+      }
+      ]
     }
+
   ]
-}
-])
+
+)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
