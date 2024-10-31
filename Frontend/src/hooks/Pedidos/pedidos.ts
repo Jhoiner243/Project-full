@@ -8,3 +8,11 @@ export interface Cliente {
     id: number;
     nombre_tienda: string;
   }
+
+  export interface PedidoGet {
+    id: number;
+    fecha: Date
+    total: number;
+    estado: 'pagado' | 'fiado'
+    pedido: PedidoGet[]
+  }

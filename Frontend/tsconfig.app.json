@@ -11,7 +11,6 @@
         "./src/*"
       ]
     },
-    /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
@@ -25,5 +24,15 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "pages/Sesion/register.tsx", "pages/dashboard-layout.tsx", "pages/error.tsx", "pages/product-view.tsx", "pages/Pedidos/pedidos-component.tsx", "pages/dashboard.tsx", "pages/dashboard.tsx"]
+  "include": [
+    "src",
+    "pages/Sesion/register.tsx",
+    "pages/dashboard-layout.tsx",
+    "pages/error.tsx",
+    "pages/productos/product-view.tsx",
+    "pages/Pedidos/pedidos-component.tsx",
+    "pages/dashboard.tsx",
+    "pages/graficasPedidos/components/configGrafic.tsx",
+    "src/services/firebase.ts"
+  ]
 }

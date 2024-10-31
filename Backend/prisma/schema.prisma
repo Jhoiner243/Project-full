@@ -20,6 +20,7 @@ model Cliente {
   direccion      String
   nombre_tienda  String
   ruta           String
+  fecha           DateTime @default(now())
 
   pedidos        Pedido[]
 }
@@ -68,10 +69,26 @@ enum Estado {
   fiado
 }
 
-model User{
-  id Int @id @default(autoincrement())
-  name String @unique
-  email String @unique
-  password String
-  createdAt DateTime @default(now())
+model User {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  password     String
+  subscription Boolean   @default(false) // O el tipo adecuado, según tus necesidades
+  createdAt    DateTime  @default(now())
+
+  PushSubscription PushSubscription[]
 }
+
+
+model PushSubscription {
+  id            Int      @id @default(autoincrement())
+  userId        Int      // Cada usuario tiene una suscripción
+  endpoint      String   @unique // Endpoint del navegador para notificaciones
+  p256dhKey     String   // Clave pública generada por el navegador
+  authKey       String   // Clave de autenticación generada por el navegador
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id])
+}
+

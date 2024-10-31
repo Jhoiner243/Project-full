@@ -1,15 +1,18 @@
 import { SidebarProvider, SidebarTrigger } from "../src/components/ui/sidebar"
 import { AppSidebar } from "../src/components/ui/app-sidebar"
 import {Outlet} from 'react-router-dom'
+import { ThemeProvider } from "../src/components/ui/proveedor-temas"
 
 export default function Layout() {
   return (
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
     <SidebarProvider>
-      <AppSidebar name={'Jhoiner'} projects="MaxPollo" url="https://www.flaticon.com/free-icon/profile_3135715" />
-      <main>
+      <AppSidebar />
+      <main className="w-full">
         <SidebarTrigger />
         <Outlet />
       </main>
     </SidebarProvider>
+    </ThemeProvider>
   )
 }

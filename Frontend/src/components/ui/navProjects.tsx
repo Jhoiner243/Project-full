@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
-import { Home, MoreHorizontal } from "lucide-react";
+import {  MoreHorizontal } from "lucide-react";
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuAction, SidebarMenuSkeleton } from "./sidebar";
+import {  useClienteSwr} from '../../hooks/Clientes/clientesSWR'
+import {Cliente} from '../../hooks/Clientes/clientes.types'
 
 interface Project {
   name: string;
@@ -10,24 +11,15 @@ interface Project {
   icon?: React.ComponentType; // Si `icon` es un componente React
 }
 
-const projects: Project[] = [
-  { name: "Project 2", url: "http://project2.com" },
-  { name: "Project 3", url: "http://project3.com" } // Puedes agregar más proyectos aquí
-];
+
 
 export function NavProjects() {
-  const [loading, setLoading] = useState(true);
 
-  // Simula un retraso en la carga de los proyectos (por ejemplo, 2 segundos)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000); // Simula un tiempo de carga de 2 segundos
-    return () => clearTimeout(timer); // Limpia el temporizador si el componente se desmonta
-  }, []);
+  const {users, isLoading, error} = useClienteSwr()
+  
 
   // Mostrar el esqueleto de carga si aún está cargando
-  if (loading) {
+  if (isLoading) {
     return (
       <SidebarMenu>
         {Array.from({ length: 5 }).map((_, index) => (
@@ -39,15 +31,16 @@ export function NavProjects() {
     );
   }
 
+  if(error){
+    throw new Error('Error en el fetch')
+  }
+
   return (
     <SidebarMenu>
-      {projects.map((project: Project, index: number) => (
+      {Array.isArray(users) && users.map((user: Cliente, index: number) => (
         <SidebarMenuItem key={index}>
           <SidebarMenuButton asChild>
-            <a href={project.url}>
-              <Home />
-              <span>{project.name}</span>
-            </a>
+           <span>{user.nombre_cliente}</span>
           </SidebarMenuButton>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -69,3 +62,5 @@ export function NavProjects() {
     </SidebarMenu>
   );
 }
+
+

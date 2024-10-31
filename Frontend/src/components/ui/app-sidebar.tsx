@@ -1,4 +1,4 @@
-import { Boxes, Calendar, ChevronDown, ChevronUp, Home, Inbox,  Search, Settings,  User2 } from "lucide-react"
+import { Boxes, Calendar, ChartNoAxesCombined, ChevronUp, Home, Inbox,  Search, Settings,  User2 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { NavProjects } from "./navProjects"
 import {
@@ -10,7 +10,6 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSkeleton,
@@ -27,14 +26,20 @@ import {
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
 import React from "react"
+import { ModeToggle } from "./modos"
 
 // Menu items.
 const items = [
   {
-    title: "Dashboard",
-    url: "/dashboard",
+    title: "Pedidos",
+    url: "pedidos",
     icon: Home,
     insigni: 21
+  },
+  {
+    title: 'Analizis',
+    url: "analizis",
+    icon: ChartNoAxesCombined,
   },
   {
     title: "Clientes",
@@ -69,40 +74,20 @@ const items = [
 
  
 export function AppSidebar() {
+  
   return (
       <Sidebar collapsible="icon">
-      
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  Select Workspace
-                  <ChevronDown className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
-                <DropdownMenuItem>
-                  <span>Acme Inc</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Acme Corp.</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
+
+    <ModeToggle />
+
+
       </SidebarHeader>
 
       <SidebarSeparator />
 
       <Collapsible defaultOpen className="group/collapsible">
         <SidebarGroupLabel asChild>
-          <CollapsibleTrigger>
-            Help
-            <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
-          </CollapsibleTrigger>
         </SidebarGroupLabel>
         <CollapsibleContent>
           <SidebarContent>
@@ -118,7 +103,6 @@ export function AppSidebar() {
                           <span>{item.title}</span>
                         </Link>
                       </SidebarMenuButton>
-                      <SidebarMenuBadge>{item.insigni}</SidebarMenuBadge>
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>
@@ -144,7 +128,7 @@ export function AppSidebar() {
         </Collapsible>
 
         <SidebarSeparator />
-        <SidebarGroupLabel>Projects</SidebarGroupLabel>
+        <SidebarGroupLabel>Clientes</SidebarGroupLabel>
         <SidebarGroupContent>
           <React.Suspense fallback={<NavProjectsSkeleton />}>
             <NavProjects />
@@ -153,13 +137,13 @@ export function AppSidebar() {
         </SidebarGroupContent>
       </SidebarGroup>
 
-      <SidebarFooter>
+      <SidebarFooter className="">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> Username
+                  <User2 /> Usuario
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

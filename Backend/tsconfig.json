@@ -11,7 +11,7 @@
       "sourceMap": true,
       "outDir": "./dist",
       "baseUrl": "./",
-      "rootDir": "./src",
+      "rootDir": "./Backend",
       "esModuleInterop": true,
       "incremental": true,
       "skipLibCheck": true,
@@ -31,6 +31,6 @@
       "strictPropertyInitialization": true,
       "noImplicitOverride": true
     },
-    "include": ["src/**/*", "serverListener.ts"],
+    "include": ["src/**/*", "serverListener.ts", "src/firebase-admin.ts"],
     "exclude": ["node_modules", "dist"]
   }

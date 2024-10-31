@@ -1,5 +1,4 @@
 
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -15,15 +14,7 @@ import { Label } from "@/components/ui/label"
 import { PlusIcon, PackageIcon } from "lucide-react"
 import { useProductos } from "@/hooks/useProducts"
 import {  ProductosProps } from "@/types/constants"
-
-export interface Dato {
-  nombre_producto: string;
-  precio_compra: number;
-  cantidad: number;
-}
-
-
-
+import NotificationButton from '../../src/services/components/botonNotifications'
 
 function AddProductForm () {
   const { handleChange, onSubmit, formProductos } = useProductos();
@@ -76,6 +67,7 @@ function AddProductForm () {
 
 export default function ProductViewComponent() {
   const {productos} = useProductos()
+  
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
@@ -112,9 +104,13 @@ export default function ProductViewComponent() {
                 <span className="text-sm text-muted-foreground">Stock: {producto.cantidad}</span>
               </div>
             </CardContent>
+
           </Card>
         ))}
       </div>
+      <NotificationButton />
     </div>
   );
 }
+
+

@@ -6,9 +6,10 @@ import {createBrowserRouter, RouterProvider} from 'react-router-dom'
 import Register from '../pages/Sesion/register.tsx'
 import {Login} from '../pages/Sesion/login.tsx'
 import Layout from '../app/layout.tsx'
-import  ProductViewComponent  from '../pages/product-view.tsx'
+import  ProductViewComponent  from '../pages/productos/product-view.tsx'
 import PedidosComponentComponent from '../pages/Pedidos/pedidos-component.tsx'
 import ClientesPage from '../pages/Clientes/clientes.tsx'
+import AnalyticsDashboard from '../pages/graficasPedidos/components/configGrafic.tsx'
 
 
 const router = createBrowserRouter ([
@@ -27,7 +28,16 @@ const router = createBrowserRouter ([
     element: <Layout/>,
     errorElement: <ErrorPage />,
   children: [
-    {index: true, element: <PedidosComponentComponent />},
+    {
+      path: 'analizis',
+      element: <AnalyticsDashboard />,
+      errorElement: <ErrorPage />
+    },
+    {
+
+      path: 'pedidos',
+      element: <PedidosComponentComponent />
+    },
       {
         path: 'products',
         element: <ProductViewComponent/>,

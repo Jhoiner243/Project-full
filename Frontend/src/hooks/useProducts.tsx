@@ -1,6 +1,6 @@
 import React, { FormEvent, useState, useEffect } from 'react'
 import {ProductosProps} from '../types/constants'
-import { Dato } from '../../pages/product-view'
+import { Dato } from '../../pages/productos/product-view'
 
 // eslint-disable-next-line react-refresh/only-export-components
 const URL = 'http://localhost:3000/api/productos'

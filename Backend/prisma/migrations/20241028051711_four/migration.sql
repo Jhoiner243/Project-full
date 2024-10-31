@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Cliente" ADD COLUMN     "fecha" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE "User" ADD COLUMN "subscription" TEXT;
+

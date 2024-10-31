@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, FormEvent } from 'react'
+import useSWR from 'swr'
 
-interface Cliente {
+export interface Cliente {
   id_cliente: string
   nombre_cliente: string
   nombre_tienda: string
@@ -8,30 +9,22 @@ interface Cliente {
   direccion: string
 }
 
+const fetcher = async (...args: [RequestInfo, RequestInit?]): Promise<Cliente[]> =>
+  fetch(...args).then(res => res.json())
+
 export const useClientes = () => {
-  const [clientes, setClientes] = useState<Cliente[]>([])
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null)
-  const [clienteSearch, setClienteSearch] = useState('')
-  const [clienteEdit, setClienteEdit] = useState<Cliente | null>(null)  // Acepta null cuando no haya cliente seleccionado
-  const [formClientes, setFormClientes] = useState()
+  const [clienteEdit, setClienteEdit] = useState<Cliente | null>(null)
+  const [formClientes, setFormClientes] = useState({
+    nombre_cliente: '',
+    telefono: '',
+    nombre_tienda: '',
+    ruta: '',
+    direccion: ''
+  })
+  const {data=[], error, isLoading} = useSWR('http://localhost:3000/api/clientes', fetcher, {refreshInterval: 1000})
 
-
-  // Función para obtener los clientes
-  const fetchClientes = () => {
-    fetch('http://localhost:3000/api/clientes')
-      .then(res => res.json())
-      .then(data => setClientes(data))
-      .catch(error => console.error('Error fetching clientes:', error))
-  }
-
-  useEffect(() => {
-    fetchClientes()  // Cargar clientes cuando el componente se monta
-  }, [])
-
-  useEffect(() => {
-    if (!clienteEdit) return  // Solo hacer el fetch cuando no hay cliente en edición
-    fetchClientes()  // Volver a cargar los clientes después de editar uno
-  }, [clienteEdit])
+  
 
 
   // Función para manejar la edición de un cliente
@@ -46,21 +39,20 @@ export const useClientes = () => {
       })
 
       if (!res.ok) {
-        throw new Error(`Error al actualizar datos del cliente: ${res.status}`)
+        throw new Error(`Error al actualizar datos del cliente: ${res.status} ${res.statusText}`)
       }
 
-      setClienteEdit(null)  // Limpiar clienteEdit después de actualizar
-      fetchClientes()  // Volver a cargar la lista actualizada
+      setClienteEdit(null)  
     } catch (error) {
       console.error('Error del fetch', error)
     }
   }
 
-  const filteredClientes = clientes.filter(cliente =>
-    cliente.nombre_tienda.toLowerCase().includes(clienteSearch.toLowerCase())
-  )
+  
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    console.log(formClientes)
+    e.preventDefault()
     try {
       const res = await fetch(`http://localhost:3000/api/clientes`, {
         method: 'POST',
@@ -71,24 +63,41 @@ export const useClientes = () => {
       })
 
       if (!res.ok) {
-        throw new Error(`Error al actualizar datos del cliente: ${res.status}`)
+        throw new Error(`Error al añadir el cliente: ${res.status} ${res.statusText}`)
       }
-
-      fetchClientes()  // Volver a cargar la lista actualizada
+      // Resetear el formulario tras añadir un cliente exitosamente
+      setFormClientes({
+        nombre_cliente: '',
+        telefono: '',
+        nombre_tienda: '',
+        ruta: '',
+        direccion: ''
+      })
     } catch (error) {
       console.error('Error del fetch', error)
     }
   }
 
+  const handleChange = (evento: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = evento.target
+    setFormClientes({
+      ...formClientes,
+      [name]: value
+    })
+  }
+
   return {
-    filteredClientes,
     clienteSeleccionado,
-    setClienteSearch,
     setClienteSeleccionado,
-    clientes,
+    clientes: data,
     clienteEdit,
     setClienteEdit,
     onSubmit,
-    setFormClientes
+    setFormClientes,
+    formClientes,
+    handleSubmit,
+    handleChange, 
+    error, 
+    isLoading
   }
 }

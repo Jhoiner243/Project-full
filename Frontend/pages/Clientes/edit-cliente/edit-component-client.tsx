@@ -34,7 +34,7 @@ const EditClienteDialog: React.FC<EditClienteDialogProps> = ({ cliente, onSubmit
   }
 
   return (
-    <Dialog open={!!editingCliente} onOpenChange={() => navigate("/clientes")}>
+    <Dialog open={!!editingCliente} onOpenChange={() => navigate("/dashboard")}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Editar Cliente</DialogTitle>
