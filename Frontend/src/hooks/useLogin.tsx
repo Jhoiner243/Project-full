@@ -19,6 +19,8 @@ export const useLogin = () =>{
             },
             body: JSON.stringify(formLogin),
           });
+
+        
       
           if (!res.ok) {
             const errorData = await res.json();  // Intentar capturar el mensaje de error
@@ -28,6 +30,7 @@ export const useLogin = () =>{
       
           const data = await res.json();
           setData(data.message);
+          localStorage.setItem('access_token', data.token);
           navigate('/dashboard');
         } catch (error) {
           console.error('Error en el fetch:', error);

@@ -1,22 +1,42 @@
+// src/controller/POST/clientes/subscripciones/tokenPost.ts
+
 import { Request, Response } from 'express';
-//import admin from "../../../../firebase-admin"; // Asegúrate de que la ruta sea correcta
+import { db } from "../../../../prisma";
 
-// Endpoint POST para almacenar el token
 export default async function suscripcionPushPOST(req: Request, res: Response): Promise<void> {
-  const { token } = req.body; // Se espera que envíes el token en el cuerpo de la solicitud
+  const { token } = req.body;
+  console.log(token)
+  if (!token) {res.status(400).json({ error: 'Token de notificación es requerido.' });
+  return 
+  }
 
-  if (!token) {
-     res.status(400).json({ error: 'Token es requerido.' });
-     return
+  if (!res.locals.userId) {
+    res.status(401).json({ message: 'Usuario no autenticado.' });
+    return
   }
 
   try {
-    // Aquí puedes almacenar el token en la base de datos
-    // Por ejemplo: await db.token.create({ data: { token } });
+    const existingToken = await db.notificationToken.findUnique({
+      where: {  id: res.locals.userId},
+    });
 
-    res.status(200).json({ message: 'Token recibido y almacenado correctamente.', token });
+    if (existingToken) {
+      await db.notificationToken.update({
+        where: { id: existingToken.id },
+        data: { token },
+      });
+    } else {
+      await db.notificationToken.create({
+        data: {
+          token,
+          user: { connect: { id: res.locals.userId} },
+        },
+      });
+    }
+
+    res.status(200).json({ message: 'Token de notificación guardado correctamente.' });
   } catch (error) {
-    console.error('Error almacenando el token:', error);
-    res.status(500).json({ error: 'Error procesando el token.' });
+    console.error('Error al guardar el token de notificación:', error);
+    res.status(500).json({ error: 'Error al procesar el token de notificación.' });
   }
 }

@@ -1,5 +1,5 @@
 import { server } from "./src/server"
-import { PORT } from "./src/config"
+import { PORT } from "./src/config/index"
 
 export const serverListener = (): Promise<void> => {
   return new Promise((resolve, reject) => {

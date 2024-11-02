@@ -1,32 +1,21 @@
-import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 
-interface JwtPayload {
-    userId: number; // o el tipo adecuado, si es diferente
-}
-
-const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
+export const autenticacionJwt = (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        res.status(401).json({ message: 'No se encontró el token de autenticación' });
-        return
+    if (!token) {
+        res.status(401).json({ error: 'Token de autenticación requerido' });
+        return 
     }
 
-    const token = authHeader.split(' ')[1]; // Obtener el token sin la palabra "Bearer"
-    
     try {
-        // Verifica y decodifica el token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
-
-        // Asigna `userId` a `req`
-        req.userId = decoded.userId;
-        next(); // Continúa al siguiente middleware o controlador
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: number };
+        res.locals.userId = decoded.userId // Asigna userId a req para su uso posterior
+        next();
     } catch (error) {
-        console.error('Error en la verificación del token:', error);
-         res.status(403).json({ message: 'Token inválido o expirado' });
-         return;
+       res.status(403).json({ error: 'Token de autenticación inválido' });
+       return 
     }
 };
-
-export default authenticateJWT;

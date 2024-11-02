@@ -1,29 +1,49 @@
-// //import admin from "../../../../firebase-admin";
-// import { db } from "../../../../prisma";
+import admin from "../../../../firebase-admin";
+import messaging from "../../../../firebase-admin";
+import { db } from "../../../../prisma";
+import type { Request, Response } from 'express';
 
+// Ruta para enviar notificaciones a todos los usuarios registrados
+export async function notificationsSend(req: Request, res: Response) {
+  try {
+    // Recupera todos los tokens desde la base de datos
+    const tokensData = await db.notificationToken.findMany();
+    const tokens = tokensData.map((token) => token.token);
 
-// // Ejemplo de lógica cuando el inventario está bajo
-// async function verificarInventario(productId: number) {
-//   const producto = await db.producto.findUnique({ where: { id: productId } });
-//   if (producto && producto.cantidad <= 10) {
-//     enviarNotificacionPush(producto);
-//   }
-// }
+    // Verifica si hay tokens disponibles
+    if (tokens.length === 0) {
+      res.status(404).json({ message: "No tokens found" });
+      return;
+    }
 
-// function enviarNotificacionPush(producto) {
-//   const mensaje = {
-//     notification: {
-//       title: 'Producto agotándose',
-//       body: `El producto ${producto.nombre} se está agotando.`,
-//     },
-//     topic: 'usuarios', // Puedes enviar a un "topic" o a tokens específicos
-//   };
+    // Configura el contenido de la notificación
+    const { title, body } = req.body;
 
-//   admin.messaging().send(mensaje)
-//     .then((response) => {
-//       console.log('Notificación enviada:', response);
-//     })
-//     .catch((error) => {
-//       console.error('Error enviando notificación:', error);
-//     });
-// }
+    const singleMessage = {
+      token: 'dJjn4zhWEa_3Dfg7pRs8vk:APA91bHFOBYMCjY43BhPkCPzDW-D4Naj-UT63UbRC51JNi7yIduxiX7LYTM_IqkQ_zK_glvkWXf_TGTnIfb08nY8UXFFUQQ84MhhP6sF__rSOIoC3UkaaJk', // Usa un token válido
+      notification: {
+        title,
+        body,
+      },
+    };
+    
+    try {
+      const response = await messaging.send(singleMessage);
+      console.log("Notification enviada correctamente:", response);
+    } catch (err) {
+      console.error("Error sending notification:", err);
+    }
+
+    
+
+    res.status(200).json({
+      status: 200,
+      message: "Notificacaciones enviadas correctamente",
+    });
+  } catch (err) {
+    console.error("Error sending notifications:", err);
+    res
+      .status(500)
+      .json({ status: 500, message: "Internal Server Error", error: err });
+  }
+}

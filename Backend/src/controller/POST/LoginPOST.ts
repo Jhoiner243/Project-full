@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import * as validator from 'validator';  
+import * as validator from 'validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { db } from '../../prisma/index';
@@ -46,11 +46,11 @@ export const LoginPOST = async (req: Request, res: Response): Promise<void> => {
 
         // Generar un token para el usuario
         const token = generarToken(validUser.id);
-
-        // Responder con el token JWT
-        res.status(200).json({ 
+        // Configurar la cookie HTTP-Only para el token
+        res.status(200)
+        .json({ 
             message: 'Inicio de sesión exitoso',
-            token 
+            token
         });
     } catch (error) {
         console.error("Error en el servidor:", error);

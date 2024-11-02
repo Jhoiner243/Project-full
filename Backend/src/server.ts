@@ -14,7 +14,6 @@ const corsOptions = {
   allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Authorization"],
   exposedHeaders: ["Authorization"],
 };
-
 //  export const vapidKeys = webPush.generateVAPIDKeys();
 //  console.log("Clave Pública:", vapidKeys.publicKey);
 //   console.log("Clave Privada:", vapidKeys.privateKey);

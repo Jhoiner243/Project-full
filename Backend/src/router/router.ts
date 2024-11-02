@@ -8,6 +8,8 @@ import { clientesPOST } from "../controller/POST/clientes/clientesPOST";
 import { clienteEdit } from "../controller/POST/clientes/clienteEdit";
 import { clienteDelete } from "../controller/POST/clientes/clientesDelete";
 import  suscripcionPushPOST  from "../controller/POST/clientes/subscripciones/tokenPost";
+import {autenticacionJwt} from "../middlewares/autenticacionJwt";
+import  {notificationsSend}  from "../controller/POST/clientes/subscripciones/subscripcionNotification";
 
 
 export const router: Router = Router();
@@ -21,4 +23,5 @@ router.post('/pedidos/:cliente_id', pedidosCreate)
 router.post('/clientes', clientesPOST)
 router.put('/clientes/:id_cliente', clienteEdit)
 router.delete('/clientes/.id_cliente', clienteDelete)
-router.post('/subscription',  suscripcionPushPOST);
+router.post('/subscription', autenticacionJwt, suscripcionPushPOST);
+router.post('/notifications',  notificationsSend);
