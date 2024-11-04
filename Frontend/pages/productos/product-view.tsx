@@ -15,6 +15,7 @@ import { PlusIcon, PackageIcon } from "lucide-react"
 import { useProductos } from "@/hooks/useProducts"
 import {  ProductosProps } from "@/types/constants"
 import NotificationButton from '../../src/services/components/botonNotifications'
+import usePedido from '../../src/hooks/Pedidos/usePedido'
 
 function AddProductForm () {
   const { handleChange, onSubmit, formProductos } = useProductos();
@@ -66,8 +67,7 @@ function AddProductForm () {
 
 
 export default function ProductViewComponent() {
-  const {productos} = useProductos()
-  
+const {products} = usePedido()  
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
@@ -92,7 +92,7 @@ export default function ProductViewComponent() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
-        {Array.isArray(productos) && productos.map((producto: ProductosProps) => (
+        {Array.isArray(products) && products.map((producto: ProductosProps) => (
           <Card  key={producto.nombre_producto}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{producto.nombre_producto}</CardTitle>

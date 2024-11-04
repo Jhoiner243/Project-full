@@ -11,8 +11,17 @@ export interface Cliente {
 
   export interface PedidoGet {
     id: number;
-    fecha: Date
+    fecha: string;
     total: number;
-    estado: 'pagado' | 'fiado'
-    pedido: PedidoGet[]
+    estado: 'pagado' | 'fiado';
+    pedido: DetallesPedidos[];
+  }
+
+  export interface DetallesPedidos {
+    id: number;
+    pedido_id: number;
+    cantidad: number;
+    precio_compra: number;
+    precio_venta: number;
+
   }

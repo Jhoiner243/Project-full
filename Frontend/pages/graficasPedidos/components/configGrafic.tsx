@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useMemo } from 'react'
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis,  Line, LineChart } from "recharts"
+import React, { useMemo } from 'react';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart } from "recharts";
 import {
   ChartTooltip,
   ChartConfig,
@@ -9,14 +9,42 @@ import {
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
-} from "@/components/ui/chart"
-import { usePedidosGet } from '@/hooks/Pedidos/usePedidosGet'
-import type { PedidoGet } from '@/hooks/Pedidos/pedidos'
-import { Skeleton } from "@/components/ui/skeleton"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/chart";
+import { usePedidosGet } from '@/hooks/Pedidos/usePedidosGet';
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Configuración de colores para los gráficos
+
+interface PedidoGet {
+  id: number;
+  fecha: string;
+  total: number;
+  estado: 'pagado' | 'fiado';
+}
+
+interface ChartData {
+  periodo: string;
+  ganancias: number;
+}
+
+interface UsePedidosGetResult {
+  pedidos: PedidoGet[];
+  isLoading: boolean;
+  error: Error | null;
+  diario: ChartData[];
+  semanal: ChartData[];
+  mensual: ChartData[];
+}
+
+
+interface ChartData {
+  periodo: string;
+  ganancias: number;
+  pedidos: number;
+  clientes: Set<number>;
+}
+
 const chartConfig = {
   ganancias: {
     label: "Ganancias",
@@ -30,35 +58,91 @@ const chartConfig = {
     label: "Clientes",
     color: "hsl(var(--chart-3))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
+
+type PeriodType = "diario" | "semanal" | "mensual";
 
 export default function GraficBarra() {
-  const { pedidos, isLoading, error } = usePedidosGet()
-  const [activeChart, setActiveChart] = React.useState<keyof typeof chartConfig>("ganancias")
-  const [activePeriod, setActivePeriod] = React.useState<"diario" | "semanal" | "mensual">("mensual")
+  const { pedidos, isLoading, error, diario, semanal, mensual } = usePedidosGet() as UsePedidosGetResult;
+  const [activeChart, setActiveChart] = React.useState<keyof typeof chartConfig>("ganancias");
+  const [activePeriod, setActivePeriod] = React.useState<PeriodType>("mensual");
 
-  // Datos de ejemplo para los gráficos
-  const gananciasData = useMemo(() => {
-    const periodos = activePeriod === "diario" ? 30 : activePeriod === "semanal" ? 12 : 12
-    return Array.from({ length: periodos }, (_, i) => ({
-      periodo: activePeriod === "diario" ? `Día ${i + 1}` : activePeriod === "semanal" ? `Semana ${i + 1}` : `Mes ${i + 1}`,
-      ganancias: Math.floor(Math.random() * 10000) + 5000,
-    }))
-  }, [activePeriod])
+  const activeData = useMemo(() => {
+    switch (activePeriod) {
+      case 'diario':
+        return diario;
+      case 'semanal':
+        return semanal;
+      case 'mensual':
+        return mensual;
+      default:
+        return [];
+    }
+  }, [activePeriod, diario, semanal, mensual]);
 
-  const pedidosClientesData = useMemo(() => {
-    const periodos = activePeriod === "diario" ? 30 : activePeriod === "semanal" ? 12 : 12
-    return Array.from({ length: periodos }, (_, i) => ({
-      periodo: activePeriod === "diario" ? `Día ${i + 1}` : activePeriod === "semanal" ? `Semana ${i + 1}` : `Mes ${i + 1}`,
-      pedidos: Math.floor(Math.random() * 100) + 50,
-      clientes: Math.floor(Math.random() * 50) + 20,
-    }))
-  }, [activePeriod])
+  const totals = useMemo(() => {
+    if (!activeData || activeData.length === 0) {
+      return { ganancias: 0, pedidos: pedidos.length, clientes: new Set(pedidos.map((p: { id: number; }) => p.id)).size };
+    }
+    return {
+      ganancias: activeData.reduce((sum, item: { ganancias: number; }) => sum + item.ganancias, 0),
+      pedidos: pedidos.length,
+      clientes: new Set(pedidos.map((p: { id: number; }) => p.id)).size,
+    };
+  }, [activeData, pedidos]);
 
-  const totalGanancias = useMemo(() => gananciasData.reduce((acc, curr) => acc + curr.ganancias, 0), [gananciasData])
-  const totalPedidos = useMemo(() => pedidosClientesData.reduce((acc, curr) => acc + curr.pedidos, 0), [pedidosClientesData])
-  const totalClientes = useMemo(() => pedidosClientesData.reduce((acc, curr) => acc + curr.clientes, 0), [pedidosClientesData])
-
+  const renderChart = () => {
+    if (isLoading) {
+      return <Skeleton className="h-[400px] w-full" />;
+    }
+    if (error) {
+      return <div className="text-red-500">Error: {error.message}</div>;
+    }
+    if (!activeData || activeData.length === 0) {
+      return <div className="flex items-center justify-center h-[400px]">No hay datos disponibles para este período</div>;
+    }
+    if (activeChart === "ganancias") {
+      return (
+        <LineChart
+          data={activeData}
+          margin={{
+            top: 5,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="periodo" />
+          <YAxis />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <ChartLegend content={<ChartLegendContent />} />
+          <Line type="monotone" dataKey="ganancias" stroke={chartConfig.ganancias.color} activeDot={{ r: 8 }} />
+        </LineChart>
+      );
+    }
+    return (
+      <BarChart
+        data={activeData}
+        margin={{
+          top: 5,
+          right: 30,
+          left: 20,
+          bottom: 5,
+        }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="periodo" />
+        <YAxis />
+        <ChartTooltip content={<ChartTooltipContent />} />
+        <ChartLegend content={<ChartLegendContent />} />
+        <Bar dataKey="pedidos" fill={chartConfig.pedidos.color} />
+        <Bar dataKey="clientes" fill={chartConfig.clientes.color} />
+      </BarChart>
+    );
+  };
+  console.log('Pedidos recibidos:', pedidos);
+console.log('Datos activos:', activeData);
   return (
     <div className='container min-[150px] max-[200px]:'>
       <Card className=''>
@@ -82,10 +166,8 @@ export default function GraficBarra() {
                 </span>
                 <span className="text-lg font-bold leading-none sm:text-3xl">
                   {key === "ganancias" 
-                    ? `$${totalGanancias.toLocaleString()}`
-                    : key === "pedidos"
-                    ? totalPedidos.toLocaleString()
-                    : totalClientes.toLocaleString()}
+                    ? `$${totals[key].toLocaleString()}`
+                    : totals[key].toLocaleString()}
                 </span>
               </button>
             ))}
@@ -100,48 +182,7 @@ export default function GraficBarra() {
             </TabsList>
             <TabsContent value={activePeriod}>
               <ChartContainer config={chartConfig} className="min-h-[400px] w-full">
-                {isLoading ? (
-                  <Skeleton className="h-[400px] w-full" />
-                ) : error ? (
-                  <div className="text-red-500">Error: {error.message}</div>
-                ) : (
-                  activeChart === "ganancias" ? (
-                    <LineChart
-                      data={gananciasData}
-                      margin={{
-                        top: 5,
-                        right: 30,
-                        left: 20,
-                        bottom: 5,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="periodo" />
-                      <YAxis />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <ChartLegend content={<ChartLegendContent />} />
-                      <Line type="monotone" dataKey="ganancias" stroke={chartConfig.ganancias.color} activeDot={{ r: 8 }} />
-                    </LineChart>
-                  ) : (
-                    <BarChart
-                      data={pedidosClientesData}
-                      margin={{
-                        top: 5,
-                        right: 30,
-                        left: 20,
-                        bottom: 5,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="periodo" />
-                      <YAxis />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <ChartLegend content={<ChartLegendContent />} />
-                      <Bar dataKey="pedidos" fill={chartConfig.pedidos.color} />
-                      <Bar dataKey="clientes" fill={chartConfig.clientes.color} />
-                    </BarChart>
-                  )
-                )}
+                {renderChart()}
               </ChartContainer>
             </TabsContent>
           </Tabs>

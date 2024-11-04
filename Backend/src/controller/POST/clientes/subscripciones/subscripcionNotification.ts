@@ -8,7 +8,7 @@ export async function notificationsSend(req: Request, res: Response) {
   try {
     // Recupera todos los tokens desde la base de datos
     const tokensData = await db.notificationToken.findMany();
-    const tokens = tokensData.map((token) => token.token);
+    const tokens: string[] = tokensData.map((token) => token.token);
 
     // Verifica si hay tokens disponibles
     if (tokens.length === 0) {
@@ -20,7 +20,7 @@ export async function notificationsSend(req: Request, res: Response) {
     const { title, body } = req.body;
 
     const singleMessage = {
-      token: 'dJjn4zhWEa_3Dfg7pRs8vk:APA91bHFOBYMCjY43BhPkCPzDW-D4Naj-UT63UbRC51JNi7yIduxiX7LYTM_IqkQ_zK_glvkWXf_TGTnIfb08nY8UXFFUQQ84MhhP6sF__rSOIoC3UkaaJk', // Usa un token válido
+      tokens: tokens, // Usa un token válido
       notification: {
         title,
         body,
@@ -28,7 +28,7 @@ export async function notificationsSend(req: Request, res: Response) {
     };
     
     try {
-      const response = await messaging.send(singleMessage);
+      const response = await messaging.sendEachForMulticast(singleMessage);
       console.log("Notification enviada correctamente:", response);
     } catch (err) {
       console.error("Error sending notification:", err);
