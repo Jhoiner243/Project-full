@@ -1,22 +1,40 @@
-import React from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Layout from "../app/layout";
+import {Login} from "../pages/Sesion/login";
+import Register from "../pages/Sesion/register";
+import ErrorPage from "../pages/error-pages/errorPage";
+import ProductViewComponent from "../pages/productos/product-view";
+import PedidosComponentComponent from "../pages/Pedidos/pedidos-component";
+import ClientesPage from "../pages/Clientes/clientes";
+import AnalyticsDashboard from "../pages/graficasPedidos/components/configGrafic";
+import { PedidoProvider } from "../pages/Pedidos/pedidoContext"; // Ajusta la ruta según tu proyecto
 
 function App() {
-  const handleSuccess = () => {
-    toast.success("¡Acción completada con éxito!");
-  };
-
-  const handleError = () => {
-    toast.error("Algo salió mal, intenta de nuevo.");
-  };
-
   return (
-    <div>
-      <button onClick={handleSuccess}>Mostrar Éxito</button>
-      <button onClick={handleError}>Mostrar Error</button>
-      <ToastContainer />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        
+        {/* Ruta protegida para Dashboard con PedidoProvider */}
+        <Route
+          path="/dashboard"
+          element={
+            <PedidoProvider>
+              <Layout />
+            </PedidoProvider>
+          }
+          errorElement={<ErrorPage />}
+        >
+          {/* Rutas hijas dentro de Dashboard */}
+          <Route path="analizis" element={<AnalyticsDashboard />} errorElement={<ErrorPage />} />
+          <Route path="pedidos" element={<PedidosComponentComponent />} errorElement={<ErrorPage />} />
+          <Route path="products" element={<ProductViewComponent />} errorElement={<ErrorPage />} />
+          <Route path="clientes" element={<ClientesPage />} errorElement={<ErrorPage />} />
+          <Route path="clientes/:id_cliente" element={<ClientesPage />} errorElement={<ErrorPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
