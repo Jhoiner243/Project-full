@@ -30,7 +30,7 @@ import { Label } from '@radix-ui/react-label'
 
 
 
-export default function PedidosComponentComponent() {
+export default function PedidoForm() {
   const { handleCantidadChange, onSubmit, products, pedido, isLoading, error, setClienteId, handleResetPedido } = usePedido();
   const [precioVenta, setPrecioVenta] = useState<{ [key: number]: number }>({});
   const [productoSeleccionado, setProductoSeleccionado] = useState<number | null>(null);
