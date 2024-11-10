@@ -1,6 +1,10 @@
-import { db } from "../../prisma/index";
+import { db } from "../../../prisma/index";
 import type { Request, Response } from "express";
 
+interface Productos {
+    precio_compra: number;
+    cantidad: number;
+}
 
 
 export const AñadirProductos = async (req: Request, res: Response): Promise<void> =>{

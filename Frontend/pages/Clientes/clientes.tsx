@@ -1,10 +1,11 @@
 "use client"
 import { useState } from 'react'
 import { ColumnDef } from "@tanstack/react-table"
+import React from 'react'
 import { MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "../../src/components/ui/button"
 import {DataTable} from './components/tabla-clientes/datos-tabla'
-import { useClientes } from "@/hooks/Clientes/useClientes"
+import { useClientes } from "../../src/hooks/Clientes/useClientes"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,10 +13,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "../../src/components/ui/dropdown-menu"
 import EditClienteDialog from './edit-cliente/edit-component-client'
 import {AñadirCliente} from '../Clientes/components/añadirCliente'
-import { useClienteSwr } from '@/hooks/Clientes/clientesSWR'
+import { useClienteSwr } from '../../src/hooks/Clientes/clientesSWR'
+import { toast } from 'react-toastify'
 // Define una interfaz para Payment (datos de los clientes)
 interface Payment {
   id_cliente: string;
@@ -57,6 +59,22 @@ export const columns: ColumnDef<Payment>[] = [
         setClienteEdit(cliente)
         setIsEditDialogOpen(true) // Muestra el diálogo al hacer clic en "Editar cliente"
       }
+
+      const handleDeleteClick = () => {
+        fetch(`http://localhost:3000/api/clientes/${cliente.id_cliente}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(res => {
+         try{ toast.success(`Cliente eliminado correctamente`) 
+          console.log(res)
+         }catch(error){
+          toast.error(`Error al eliminar cliente ${error}`)
+        }
+        })
+      }
       return (
         <>
           <DropdownMenu>
@@ -72,9 +90,10 @@ export const columns: ColumnDef<Payment>[] = [
                 Editar cliente
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(cliente.id_cliente)}
+                onClick={handleDeleteClick} 
+                className="text-red-500"
               >
-                Copiar ID del cliente
+                Eliminar cliente
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Ver detalles del cliente</DropdownMenuItem>

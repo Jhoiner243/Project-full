@@ -1,6 +1,6 @@
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import UpdateProduct from '../../pages/productos/actualizarProducto'
 import {
   Dialog,
   DialogContent,
@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { PlusIcon, PackageIcon } from "lucide-react"
+import { PlusIcon,  RefreshCw, Trash2 } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 import { useProductos } from "@/hooks/useProducts"
-import {  ProductosProps } from "@/types/constants"
-import NotificationButton from '../../src/services/components/botonNotifications'
-import usePedido from '../../src/hooks/Pedidos/usePedido'
+import usePedido, { Productos } from '../../src/hooks/Pedidos/usePedido'
+import { useState } from "react"
 
 function AddProductForm () {
   const { handleChange, onSubmit, formProductos } = useProductos();
@@ -68,15 +68,23 @@ function AddProductForm () {
 
 export default function ProductViewComponent() {
 const {products} = usePedido()  
+const {handleUpdateProduct, setUpdateProduct} = useProductos()
+const [DialogUpdateProduct, setDialogUpdateProduct] = useState<boolean>(false)
+
+const handleClickUpdate = () => {
+  setUpdateProduct(products)  
+  setDialogUpdateProduct(true)
+}
+console.log(products); // Agrega este log justo después de definir products
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold pr-2">Productos</h1>
         <Dialog>
-          <DialogTrigger asChild className="flex justify-end pb-3">
+          <DialogTrigger asChild className="flex justify-end pb-3 mb-1">
             <Button>
               Añadir Producto
-              <PlusIcon className="ml-2 h-4 w-4" />
+              <PlusIcon className="ml-2 h-4 w-4 mb-4" />
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
@@ -91,26 +99,36 @@ const {products} = usePedido()
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
-        {Array.isArray(products) && products.map((producto: ProductosProps) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+        {Array.isArray(products) && products.map((producto: Productos) => (
           <Card  key={producto.nombre_producto}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{producto.nombre_producto}</CardTitle>
-              <PackageIcon className="h-4 w-4 text-muted-foreground" />
+            <div className="flex space-x-2 gap-2">
+          <Button onClick={handleClickUpdate} className="flex-1" variant="outline">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Actualizar
+          </Button>
+          <Button variant="destructive" className="px-3">
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
             </CardHeader>
             <CardContent>
               <div className="mt-2 flex justify-between">
                 <span className="text-2xl font-bold">${producto.precio_compra}</span>
-                <span className="text-sm text-muted-foreground">Stock: {producto.cantidad}</span>
+                <Badge variant='outline' className="text-sm text-slate-500 text-center">Stock: {producto.cantidad}</Badge>
+                {
+                  DialogUpdateProduct ? (
+                    <UpdateProduct producto={producto} handleUpdateProduct={handleUpdateProduct}/>
+                  ): null
+                }
               </div>
             </CardContent>
-
           </Card>
         ))}
       </div>
-      <NotificationButton />
     </div>
   );
 }
-
 

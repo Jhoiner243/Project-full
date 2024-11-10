@@ -2,7 +2,7 @@ import { Router } from "express";
 import { RegisterPOST } from "../controller/POST/RegisterPOST";
 import { LoginPOST } from "../controller/POST/LoginPOST";
 import { GetLogin, updateLogin } from "../controller/GET/GetLogin";
-import { AñadirProductos } from "../controller/POST/Productos";
+import { AñadirProductos } from "../controller/POST/Productos/Productos";
 import { pedidosCreate } from "../controller/POST/PedidosPOST";
 import { clientesPOST } from "../controller/POST/clientes/clientesPOST";
 import { clienteEdit } from "../controller/POST/clientes/clienteEdit";
@@ -22,6 +22,6 @@ router.post('/productos', AñadirProductos)
 router.post('/pedidos/:cliente_id', pedidosCreate)
 router.post('/clientes', clientesPOST)
 router.put('/clientes/:id_cliente', clienteEdit)
-router.delete('/clientes/.id_cliente', clienteDelete)
+router.delete('/clientes/:id_cliente', clienteDelete)
 router.post('/subscription', autenticacionJwt, suscripcionPushPOST);
 router.post('/notifications',  notificationsSend);

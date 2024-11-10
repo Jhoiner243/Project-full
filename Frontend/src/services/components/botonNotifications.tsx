@@ -3,6 +3,8 @@ import { messaging } from "../../../firebase";
 import { getToken, onMessage } from "firebase/messaging";
 import { useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
+import { Button } from "@/components/ui/button"
+import { Bell} from "lucide-react"
 
 function NotificationButton() {
   const solicitarPermisoDeNotificacion = () => {
@@ -67,9 +69,10 @@ function NotificationButton() {
   return (
     <>
     <ToastContainer />
-    <button onClick={solicitarPermisoDeNotificacion}>
-      Activar Notificaciones
-    </button>
+    <Button onClick={solicitarPermisoDeNotificacion}size="icon" variant="ghost">
+    <Bell className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
+    <span className="sr-only">Notifications</span>
+    </Button>
     </>
   );
 }

@@ -16,6 +16,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import NotificationButton from '@/services/components/botonNotifications'
 
 export default function Layout()  {
   return (
@@ -38,6 +39,7 @@ export default function Layout()  {
                 <BreadcrumbItem>
                   <BreadcrumbPage>Data Fetching</BreadcrumbPage>
                 </BreadcrumbItem>
+                <NotificationButton />
               </BreadcrumbList>
             </Breadcrumb>
           </div>

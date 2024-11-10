@@ -9,6 +9,18 @@ export const clienteDelete = async (req: Request, res: Response) => {
     try {
         const  id_cliente  = req.params.id_cliente
 
+        const deleteDetallesPedidos = await db.detallePedido.deleteMany({
+            where: {
+                id: Number(id_cliente)
+            }         
+        })
+
+        const deletePedidos = await db.pedido.deleteMany({
+            where: {
+                id: Number(id_cliente)
+            }         
+        })
+
         if(!id_cliente){
             res.status(403).json({message: 'Falta id del cliente'})
         }
@@ -23,6 +35,9 @@ export const clienteDelete = async (req: Request, res: Response) => {
                 id_cliente: id_cliente_number
             }         
         })
+        
+        res.status(200).json()
+
     } catch (error) {
         console.log('Error al eliminar cliente')
     }
