@@ -2,9 +2,9 @@ import type{Request, Response} from 'express'
 import { db } from "../../prisma";
 import { Router } from 'express'; 
 
-const router: Router = Router()
+export const routerUsers: Router = Router()
 
-router.get('/user', async (req: Request, res: Response) => {
+routerUsers.get('/user', async (req: Request, res: Response) => {
     try {
         const user = await db.user.findFirst()
         if (!user) {
@@ -18,4 +18,3 @@ router.get('/user', async (req: Request, res: Response) => {
     }
 })
 
-export default router

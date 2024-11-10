@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import useSWR from 'swr';
 
 export interface Productos {
@@ -18,13 +18,19 @@ export default function useProductos() {
     { refreshInterval: 1000 }
   );
 
+  // Crear referencia para rastrear si ya se ha enviado la notificación
+  const notificationSentRef = useRef(false);
+
   useEffect(() => {
+    // Filtrar productos con cantidad baja
     const productosConBajaCantidad = data.filter(
       (producto) => producto.cantidad < 10
     );
 
-    if (productosConBajaCantidad.length > 0) {
+    // Enviar notificación si hay productos con baja cantidad y aún no se ha enviado la notificación
+    if (productosConBajaCantidad.length > 0 && !notificationSentRef.current) {
       notification();
+      notificationSentRef.current = true; // Marcar como enviada
     }
   }, [data]);
 

@@ -21,9 +21,7 @@ import {
   Collapsible,
   CollapsibleContent,
 } from "@/components/ui/collapsible"
-
 import React from "react"
-
 
 
 
@@ -31,7 +29,7 @@ const data = {
   user: {
     name: "shadcn",
     email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "https://github.com/shadcn.png" ,
   },
   projects: [
     {

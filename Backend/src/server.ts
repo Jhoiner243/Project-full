@@ -8,6 +8,7 @@ import clientesGet from './controller/GET/ClientesGet';
 import pedidosRouter from './controller/GET/pedidosGet'
 import cookieParser from 'cookie-parser'
 import { routerProducts } from './controller/POST/Productos/productosDelete';
+import {routerUsers} from './controller/GET/userGet'
 const corsOptions = {
   origin: "http://localhost:5173", // Asegúrate de que este sea el origen correcto
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -26,7 +27,7 @@ server.use(json());
 server.use(cookieParser());
 server.use('*',cors(corsOptions))
 
-
+server.use('/api', routerUsers)
 server.use('/api', router)
 server.use('/api', productosRouter)
 server.use('/api', routerProducts)
