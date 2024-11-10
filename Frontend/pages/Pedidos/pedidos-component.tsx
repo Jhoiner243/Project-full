@@ -1,11 +1,10 @@
-'use cliente'
-import {  useState } from 'react'
-import {  useNavigate, useParams } from 'react-router-dom'
+'use client'
+import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ShoppingCart, Plus, Package } from "lucide-react"
+import { Plus } from "lucide-react"
 import { Skeleton } from '@/components/ui/skeleton'
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons"
 import { cn } from "../../src/lib/utils"
@@ -24,19 +23,19 @@ import {
 } from "../../src/components/ui/popover"
 import { useClienteSwr } from "@/hooks/Clientes/clientesSWR"
 import { Cliente } from "@/hooks/Clientes/clientes.types"
-import usePedido from "@/hooks/Pedidos/usePedido"
 import * as React from "react"
 import { Label } from '@radix-ui/react-label'
-
-
+import { usePedidoContext } from "./pedidoContext"
+import useProductos  from '../../src/hooks/Pedidos/usePedido'
+import { toast } from 'react-toastify'
 
 export default function PedidoForm() {
-  const { handleCantidadChange, onSubmit, products, pedido, isLoading, error, setClienteId, handleResetPedido } = usePedido();
+  const { onSubmit, pedido, resetPedido, addProducto, clienteId } = usePedidoContext();
+  const { products, isLoading, error,  } = useProductos()
   const [precioVenta, setPrecioVenta] = useState<{ [key: number]: number }>({});
   const [productoSeleccionado, setProductoSeleccionado] = useState<number | null>(null);
   const [cantidadInput, setCantidadInput] = useState<string>('');
   const [precioVentaInput, setPrecioVentaInput] = useState<string>('');
-  const { cliente_id } = useParams();
 
   const calcularTotal = () => {
     return pedido.reduce((total, item) => {
@@ -51,23 +50,27 @@ export default function PedidoForm() {
 
   const handleAgregarProducto = () => {
     if (productoSeleccionado && cantidadInput && precioVentaInput) {
-      handleCantidadChange(productoSeleccionado, Number(cantidadInput), Number(precioVentaInput));
-      setPrecioVenta(prev => ({ ...prev, [productoSeleccionado]: Number(precioVentaInput) }));
+      addProducto({
+        id: productoSeleccionado,
+        cantidad: Number(cantidadInput),
+        precio_venta: Number(precioVentaInput),
+      });
       setCantidadInput('');
-      setPrecioVentaInput('');
+      setPrecioVenta(prev => ({ ...prev, [productoSeleccionado]: Number(precioVentaInput) }));
+      setProductoSeleccionado(null);
     }
   };
 
-  React.useEffect(() => {
-    if (cliente_id) {
-      setClienteId(cliente_id);
-    }
-  }, [cliente_id, setClienteId]);
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit(pedido);
-    handleResetPedido();
+    console.log('clienteId antes de enviar:', clienteId);
+    if (!clienteId) {
+      console.error('clienteId es undefined');
+      toast.error('Selecciona un cliente');
+      return; // Detén el envío si `clienteId` es undefined
+    }
+    onSubmit(pedido); // Usa la función `onSubmit` del contexto
+    resetPedido();
   };
 
   if (isLoading) {
@@ -98,150 +101,128 @@ export default function PedidoForm() {
   }
 
   return (
-    <div className="lg:w-1/3 mb-8 lg:mb-0 order-2 lg:order-2">
-      <h1 className="text-3xl font-bold mb-6 text-center">Nuevo Pedido</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col lg:flex-row gap-8">
-        <div className="w-full lg:w-1/3">
-          <ComboboxDemo />
-        </div>
-        
-        <div className="products-bar mb-6">
-          <Card className="lg:w-2/3 order-1 lg:order-1">
-            <CardHeader>
-              <CardTitle className="text-2xl">Productos Disponibles</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {products?.filter(p => p.cantidad > 0).map((producto) => (
-                  <Card 
-                    key={producto.id} 
-                    className={`shadow-sm cursor-pointer transition-all ${
-                      productoSeleccionado === producto.id ? 'ring-2 ring-primary' : ''
-                    }`}
-                    onClick={() => setProductoSeleccionado(producto.id)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-sm">{producto.nombre_producto}</h3>
-                        <Package className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">Stock: {producto.cantidad}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+    <div className="container mx-auto p-4 flex flex-col md:flex-row gap-8">
+      {/* Formulario de productos */}
+      <form onSubmit={handleSubmit} className="md:w-2/3">
+        <div className="md:w-full">
+          <CardHeader>
+            <CardTitle className="mt-0">Productos Disponibles</CardTitle>
+          </CardHeader>
+          <CardContent className="bg-slate-100 p-4 rounded-lg">
+            <div className="flex flex-wrap gap-4 bg-slate-400 p-4 rounded-lg cursor-pointer">
+              {products.map((product) => (
+                <Card
+                  key={product.id}
 
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle className="text-lg">Producto Seleccionado</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="text-sm text-muted-foreground">
-                      {productoSeleccionado 
-                        ? products.find(p => p.id === productoSeleccionado)?.nombre_producto 
-                        : 'Ningún producto seleccionado'}
-                    </div>
-                    <div className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                      <div>
-                        <Label htmlFor="cantidad">Cantidad</Label>
-                        <Input
-                          id="cantidad"
-                          type="number"
-                          min="0"
-                          max={products.find(p => p.id === productoSeleccionado)?.cantidad || 0}
-                          value={cantidadInput}
-                          onChange={(e) => setCantidadInput(e.target.value)}
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="precio">Precio de Venta</Label>
-                        <Input
-                          id="precio"
-                          type="number"
-                          min="0"
-                          value={precioVentaInput}
-                          onChange={(e) => handlePrecioVentaChange(e.target.value)}
-                          className="mt-1"
-                        />
-                      </div>
-                    </div>
-                    <Button 
-                      type="button" 
-                      onClick={handleAgregarProducto} 
-                      disabled={!productoSeleccionado || !cantidadInput || !precioVentaInput}
-                      className="w-full"
-                    >
-                      <Plus className="mr-2 h-4 w-4" /> Agregar a Factura
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </CardContent>
-          </Card>
-          <div className='min-w-full divide-y divide-gray-200'>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">Factura</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PRODUCTO</TableHead>
-                    <TableHead className="font-semibold">CANTIDAD</TableHead>
-                    <TableHead className="font-semibold">PRECIO</TableHead>
-                    <TableHead className="font-semibold">TOTAL</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pedido.map((item) => {
-                    const producto = products.find((p) => p.id === item.id);
-                    if (!producto) return null;
-                    const precioFinal = precioVenta[item.id] || producto.precio_compra;
-                    return (
-                      <TableRow key={item.id}>
-                        <TableCell>{producto.nombre_producto}</TableCell>
-                        <TableCell>{item.cantidad}</TableCell>
-                        <TableCell>${precioFinal.toLocaleString()}</TableCell>
-                        <TableCell>${(precioFinal * item.cantidad).toLocaleString()}</TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-              <div className="mt-6 text-right">
-                <p className="text-2xl font-bold">Total: ${calcularTotal().toLocaleString()}</p>
+                  className="h-auto py-2 px-4 text-sm cursor-pointer hover:bg-slate-200"
+                  onClick={() => setProductoSeleccionado(product.id)}
+                >
+                  {product.nombre_producto}
+                </Card>
+              ))}
+            </div>
+            <div className="mt-4 space-y-4">
+              <div>
+                <Label htmlFor="product">Producto Seleccionado</Label>
+                <Input
+                  id="product"
+                  value={productoSeleccionado ? productoSeleccionado : 'Ningún producto seleccionado'}
+                  readOnly
+                  className="mt-1"
+                />
               </div>
-              <Button type="submit" size="lg" className="w-full mt-4">
-                <ShoppingCart className="mr-2 h-5 w-5" /> Finalizar Pedido
-              </Button>
-            </CardContent>
-          </Card>
-          </div>
+              <div>
+                <Label htmlFor="cantidad">Cantidad</Label>
+                <Input
+                  id="cantidad"
+                  type="number"
+                  min="0"
+                  max={products.find(p => p.id === productoSeleccionado)?.cantidad || 0}
+                  value={cantidadInput}
+                  onChange={(e) => setCantidadInput(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="precio">Precio de Venta</Label>
+                <Input
+                  id="precio"
+                  type="number"
+                  min="0"
+                  value={precioVentaInput}
+                  onChange={(e) => handlePrecioVentaChange(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            <Button 
+              type="button" 
+              onClick={handleAgregarProducto} 
+              disabled={!productoSeleccionado || !cantidadInput || !precioVentaInput}
+              className="mt-4 w-full"
+            >
+              <Plus className="mr-2 h-4 w-4" /> Agregar a Factura
+            </Button>
+          </CardContent>
         </div>
+
+      {/* Factura */}
+      <div className="md:w-1/3">
+        <Card className="bg-white shadow-lg p-4 rounded-lg">
+          <CardHeader>
+            <CardTitle>Factura</CardTitle>
+            <ComboboxDemo />
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40%]">Producto</TableHead>
+                  <TableHead>Cantidad</TableHead>
+                  <TableHead>Precio</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pedido.map((item) => {
+                  const producto = products.find((p) => p.id === item.id);
+                  if (!producto) return null;
+                  const precioFinal = precioVenta[item.id] || producto.precio_compra;
+                  return (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{producto.nombre_producto}</TableCell>
+                      <TableCell>{item.cantidad}</TableCell>
+                      <TableCell>${precioFinal.toLocaleString()}</TableCell>
+                      <TableCell className="text-right">${(precioFinal * item.cantidad).toLocaleString()}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+            <div className="flex items-center justify-between pt-4">
+              <CardTitle>Total</CardTitle>
+              <div className="text-2xl font-bold">${calcularTotal().toLocaleString()}</div>
+            </div>
+            <Button type="submit" className="w-full mt-4">
+              Finalizar Pedido
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
       </form>
     </div>
   );
 }
 
-
 export function ComboboxDemo() {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState<{ cliente_id: number; nombre_tienda: string } | null>(null);
   const { users } = useClienteSwr();
-  const { setClienteId } = usePedido();
-  
-  const navigate = useNavigate(); // Hook para redirigir
+  const { setClienteId } = usePedidoContext();
 
-  const handleSelectCliente = (cliente_id: number, nombre_tienda: string) => {
-    setValue({ cliente_id, nombre_tienda });
-    setClienteId(cliente_id.toString());
-    
-    // Actualiza la URL con el nuevo cliente_id
-    navigate(`/pedidos/${cliente_id}`); // Esto cambiará la URL
-    
+  const handleSelectCliente = (user: Cliente) => {
+    setValue({ cliente_id: user.id_cliente, nombre_tienda: user.nombre_tienda });
+    setClienteId(user.id_cliente.toString());
     setOpen(false);
   };
 
@@ -255,20 +236,12 @@ export function ComboboxDemo() {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Buscar cliente..." className="h-9" />
+          <CommandInput placeholder="Buscar cliente..." />
           <CommandList>
-            <CommandEmpty>Cliente no encontrado</CommandEmpty>
+            <CommandEmpty>No se encontraron coincidencias.</CommandEmpty>
             <CommandGroup>
-              {Array.isArray(users) && users?.map((user: Cliente) => (
-                <CommandItem
-                  key={user.id_cliente}
-                  onClick={() => handleSelectCliente(user.id_cliente, user.nombre_tienda)}
-                  onSelect={() => {
-                    // Esto asegurará que la opción seleccionada se muestre
-                    setValue({ cliente_id: user.id_cliente, nombre_tienda: user.nombre_tienda });
-                    setOpen(false);
-                  }}
-                >
+              {users.map((user) => (
+                <CommandItem key={user.id_cliente} onSelect={() => handleSelectCliente(user)}>
                   <CheckIcon className={cn("mr-2 h-4 w-4", value?.cliente_id === user.id_cliente ? "opacity-100" : "opacity-0")} />
                   {user.nombre_tienda}
                 </CommandItem>
