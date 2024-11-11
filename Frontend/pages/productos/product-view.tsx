@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { useProductos } from "@/hooks/useProducts"
 import usePedido, { Productos } from '../../src/hooks/Pedidos/usePedido'
 import { useState } from "react"
+import { toast } from "react-toastify"
 
 function AddProductForm () {
   const { handleChange, onSubmit, formProductos } = useProductos();
@@ -71,6 +72,28 @@ const {products} = usePedido()
 const {handleUpdateProduct, setUpdateProduct} = useProductos()
 const [DialogUpdateProduct, setDialogUpdateProduct] = useState<boolean>(false)
 
+const handeleDeleteClick = (id: number) => {
+  try{
+    fetch(`http://localhost:3000/api/productos/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(res => {
+     try{ toast.success(`Producto eliminado correctamente`) 
+      console.log(res)
+     }catch(error){
+      toast.error(`Error al eliminar producto`)
+      console.log(error)
+    }
+    })
+  }catch(error){
+    console.log('Error al eliminar producto', error)
+  }
+
+}
+
 const handleClickUpdate = () => {
   setUpdateProduct(products)  
   setDialogUpdateProduct(true)
@@ -109,7 +132,7 @@ console.log(products); // Agrega este log justo después de definir products
             <RefreshCw className="mr-2 h-4 w-4" />
             Actualizar
           </Button>
-          <Button variant="destructive" className="px-3">
+          <Button onClick={() => handeleDeleteClick(producto.id)} variant="destructive" className="px-3">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>

@@ -1,19 +1,19 @@
 'use client'
-import {useLogin} from '../../src/hooks/useLogin'
-import { Button } from "../../src/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../src/components/ui/card"
-import { Input } from "../../src/components/ui/input"
-import { Label } from "../../src/components/ui/label"
-
+import {useLogin} from '../../../src/hooks/useLogin'
+import { Button } from "../../../src/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../../src/components/ui/card"
+import { Input } from "../../../src/components/ui/input"
+import { Label } from "../../../src/components/ui/label"
+import React from 'react'
 
 export const Login = () =>{
     const { handleChange, onSubmit, formLogin} = useLogin()
     
     return(
         <div>
-        <Card className="w-full max-w-md">
+        <Card className="m-4 max-w-md">
         <CardHeader>
-          <CardTitle>Inicio de sesion</CardTitle>
+          <CardTitle className='text-center'>Inicio de sesión</CardTitle>
         </CardHeader>
         <form onSubmit={onSubmit}>
         <CardContent className="space-y-4">

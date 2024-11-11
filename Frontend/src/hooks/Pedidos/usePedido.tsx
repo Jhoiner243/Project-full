@@ -14,27 +14,29 @@ const fetcher = (...args: [RequestInfo, RequestInit?]): Promise<Productos[]> =>
 export default function useProductos() {
   const { data = [], isLoading, error } = useSWR(
     'http://localhost:3000/api/productos',
-    fetcher,
-    { refreshInterval: 1000 }
+    fetcher, {refreshInterval: 1000}
   );
 
-  // Crear referencia para rastrear si ya se ha enviado la notificación
-  const notificationSentRef = useRef(false);
+  // Ref para rastrear los productos notificados
+  const notifiedProductsRef = useRef<Set<number>>(new Set());
 
   useEffect(() => {
-    // Filtrar productos con cantidad baja
+    // Filtrar productos que tienen baja cantidad y no han recibido notificación
     const productosConBajaCantidad = data.filter(
-      (producto) => producto.cantidad < 10
+      (producto) => producto.cantidad < 5 && !notifiedProductsRef.current.has(producto.id)
     );
 
-    // Enviar notificación si hay productos con baja cantidad y aún no se ha enviado la notificación
-    if (productosConBajaCantidad.length > 0 && !notificationSentRef.current) {
-      notification();
-      notificationSentRef.current = true; // Marcar como enviada
+    if (productosConBajaCantidad.length > 0) {
+      // Enviar notificación para cada producto nuevo en bajo stock
+      productosConBajaCantidad.forEach((producto) => {
+        sendNotification(producto);
+        notifiedProductsRef.current.add(producto.id); // Marcar producto como notificado
+      });
     }
   }, [data]);
 
-  const notification = () => {
+  // Función para enviar notificación personalizada para cada producto
+  const sendNotification = (producto: Productos) => {
     fetch('http://localhost:3000/api/notifications', {
       method: 'POST',
       headers: {
@@ -42,7 +44,7 @@ export default function useProductos() {
       },
       body: JSON.stringify({
         title: 'Stock Bajo',
-        body: 'Algunos productos tienen menos de 10 kl. Revisa el inventario.',
+        body: `El producto ${producto.nombre_producto} tiene menos de 10 kl en stock. Revisa el inventario.`,
       }),
     })
       .then((response) => response.json())

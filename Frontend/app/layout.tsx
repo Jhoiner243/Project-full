@@ -44,7 +44,7 @@ export default function Layout()  {
             </Breadcrumb>
           </div>
         </header>
-        <main>
+        <main >
           <Outlet />
         </main>
       </SidebarInset>

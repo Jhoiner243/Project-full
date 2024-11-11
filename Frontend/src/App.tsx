@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Layout from "../app/layout";
-import {Login} from "../pages/Sesion/login";
+import LoginPage from "../pages/Sesion/Login/loginPage";
 import Register from "../pages/Sesion/register";
 import ErrorPage from "../pages/error-pages/errorPage";
 import ProductViewComponent from "../pages/productos/product-view";
@@ -13,7 +13,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<LoginPage />} />
         <Route path="/register" element={<Register />} />
         
         {/* Ruta protegida para Dashboard con PedidoProvider */}

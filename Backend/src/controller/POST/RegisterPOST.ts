@@ -15,6 +15,7 @@ export const RegisterPOST = async (req: Request, res: Response): Promise<void> =
 
     if(!validator.isEmail(email)){
         res.status(403).json({message: 'Formato de email invalido'})
+        return
     }
     
     if (!validator.isLength(password, {min: 8, max: 20})) {
