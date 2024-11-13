@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # Servicio de la base de datos PostgreSQL
+  db:
+    image: postgres:latest
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Alanna2345
+      POSTGRES_DB: db_maxpollo
+    ports:
+      - "5433:5432"  # Mapea el puerto 5433 en localhost al puerto 5432 dentro del contenedor
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # Persistencia de datos de la base de datos
+
+  # Servicio de backend con Node.js + Express (y posiblemente tu frontend si lo prefieres)
+  backend:
+    build:
+      context: .  # El directorio donde está tu Dockerfile
+      dockerfile: backend/Dockerfile  # Asume que tienes un Dockerfile en la carpeta "backend"
+    container_name: backend-container
+    environment:
+      DATABASE_URL: "postgres://postgres:Alanna2345@db:5432/db_maxpollo"  # Conexión a la base de datos (db es el nombre del servicio)
+    ports:
+      - "3001:3001"  # Mapea el puerto 3001 en localhost al puerto 3001 dentro del contenedor (backend API)
+    depends_on:
+      - db  # Asegura que el backend se inicie después de la base de datos
+    restart: always  # Reinicia el contenedor si se cae
+
+volumes:
+  pgdata:  # Volumen persistente para la base de datos PostgreSQL
